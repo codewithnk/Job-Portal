@@ -4,12 +4,16 @@ import mongoose from "mongoose";
 const CompanySchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        unique:true
     },
     description: {
         type: String
     },
     website: {
+        type: String
+    },
+    location : {
         type: String
     },
     logo: {

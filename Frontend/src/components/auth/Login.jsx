@@ -4,10 +4,14 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { RadioGroup } from '../ui/radio-group'
 import { Button } from '../ui/button'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import axios from 'axios'
 import { USER_API_END_POINT } from '@/utils/constant'
+import { setLoading } from '@/redux/authSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import store from '@/redux/store'
+import { Loader2 } from 'lucide-react'
 
 const Login = () => {
 
@@ -17,31 +21,38 @@ const Login = () => {
     role: "",
   });
 
+  const {loading} = useSelector(store => store.auth) 
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
-  } 
+  }
 
 
   const submitHandler = async (e) => {
-    e.preventDefault()     
+    e.preventDefault()
     try {
+      dispatch(setLoading(true))
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-          headers: { 'Content-Type': 'application/json'  },
-          withCredentials: true,
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
       });
       if (res.data.success) {
-          navigate("/");
-          toast.success(res.data.message);
-      }else {
-          toast.error('An unexpected error occurred.');
+        navigate("/");
+        toast.success(res.data.message);
+      } else {
+        toast.error('An unexpected error occurred.');
       }
-  } catch (error) {
+    } catch (error) {
       console.log('Error:', error);
       if (error.response) {
-          console.log('Error Response:', error.response);
-          toast.error(error.response.data.message);
-      } 
-  }
+        console.log('Error Response:', error.response);
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      dispatch(setLoading(false));
+    }
   }
 
   return (
@@ -96,7 +107,9 @@ const Login = () => {
               </div>
             </RadioGroup>
           </div>
-          <Button type="submit" className="w-full my-4">Login</Button>
+          {
+               loading ? <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-4">Login</Button>
+          }         
           <span className='text-sm'>Already have an account? <Link to="/signup" className='text-blue-600'>Signup</Link></span>
         </form>
       </div>

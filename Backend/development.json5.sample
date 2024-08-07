@@ -1,4 +1,6 @@
-
-MONGO_URI = mongodb://localhost:27017/JobPortal    
+MONGO_URI = mongodb://localhost:27017/JobPortal
 PORT = 8000
 SECRET_KEY=sbfjsghfczbsfjkgszkcsfsj
+CLOUD_NAME=dylbys6tr
+API_KEY=935352322854178
+API_SECRET=lcNIwTT_22Lxnd2kULuNJyZMxFA

@@ -13,7 +13,7 @@ const fitlerData = [
   },
   {
     fitlerType: "Salary",
-    array: ["0-40k", "42-1lakh", "1lakh to 5lakh"]
+    array: ["0-40 k", "42-1 lakh", "1 lakh to 5 lakh"]
   },
 ]
 
@@ -24,8 +24,8 @@ const FilterCard = () => {
       <hr className='mt-3' />
       <RadioGroup>
         {
-          fitlerData.map((data, index) => (
-            <div>
+          fitlerData?.map((data, index) => (
+            <div key={index}>
               <h1 className='font-bold text-lg'>{data.fitlerType}</h1>
               {
                 data.array.map((item, index) => {

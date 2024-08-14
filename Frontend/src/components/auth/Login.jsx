@@ -38,6 +38,8 @@ const Login = () => {
       if (res.data.success) {
         dispatch(setUser(res.data.user));
         navigate("/");
+        const token = res.data.message;
+        console.log(token);
         toast.success(res.data.message);
       } else {
         toast.error("An unexpected error occurred.");

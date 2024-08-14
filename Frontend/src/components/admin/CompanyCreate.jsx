@@ -4,25 +4,24 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import axios from "axios";
 import { COMPANY_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
 import { setSingleCompany } from "@/redux/companySlice";
 
 const CompanyCreate = () => {
   const navigate = useNavigate();
   const [companyName, setCompanyName] = useState();
   const dispatch = useDispatch();
-
   const registerNewCompany = async () => {
     try {
       const res = await axios.post(
         `${COMPANY_API_END_POINT}/register`,
         { companyName },
         {
-          heaaders: {
-            "Content-Type": "appliaction/json",
+          headers: {
+            "Content-Type": "application/json",
           },
           withCredentials: true,
         }
@@ -48,6 +47,7 @@ const CompanyCreate = () => {
             later.
           </p>
         </div>
+
         <Label>Company Name</Label>
         <Input
           type="text"
@@ -60,7 +60,7 @@ const CompanyCreate = () => {
             variant="outline"
             onClick={() => navigate("/admin/companies")}
           >
-            Cancle
+            Cancel
           </Button>
           <Button onClick={registerNewCompany}>Continue</Button>
         </div>

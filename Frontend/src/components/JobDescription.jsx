@@ -3,26 +3,23 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import {
-  APPLICATION_API_END_POINT,
-  USER_API_END_POINT,
-} from "@/utils/constant";
+import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from "@/utils/constant";
 import { setSingleJob } from "@/redux/jobSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 const JobDescription = () => {
-  // const isApplied = true;
-  const param = useParams();
-  const jobId = param.id;
-  const { singleJob } = useSelector((store) => store.job);
+  const singleJob = useSelector((state) => state.job.singleJob);
+  console.log(singleJob, "mdwfguihesdgrdjhuiehgwjiegur");
   const { user } = useSelector((store) => store.auth);
   const isIntiallyApplied =
     singleJob?.applications?.some(
-      (application) => application.applicant === user?._id
+      (application) => application?.applicant == user?._id
     ) || false;
   const [isApplied, setIsApplied] = useState(isIntiallyApplied);
 
+  const params = useParams();
+  const jobId = params.id;
   const dispatch = useDispatch();
 
   const applyJobHandler = async () => {
@@ -31,16 +28,19 @@ const JobDescription = () => {
         `${APPLICATION_API_END_POINT}/apply/${jobId}`,
         { withCredentials: true }
       );
+
       if (res.data.success) {
-        setIsApplied(true);
+        setIsApplied(true); // Update the local state
         const updatedSingleJob = {
           ...singleJob,
-          applications: [...singleJob.applications, { applicant: user?._id }],
+          applications: [...singleJob?.applications, { applicant: user?._id }],
         };
-        dispatch(setSingleJob(updatedSingleJob));
+        console.log(updatedSingleJob);
+        dispatch(setSingleJob(updatedSingleJob)); // helps us to real time UI update
         toast.success(res.data.message);
       }
     } catch (error) {
+      console.log(error);
       toast.error(error.response.data.message);
     }
   };
@@ -48,41 +48,44 @@ const JobDescription = () => {
   useEffect(() => {
     const fetchSingleJob = async () => {
       try {
-        const res = await axios.get(`${USER_API_END_POINT}/get/${jobId}`, {
+        const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, {
           withCredentials: true,
         });
         if (res.data.success) {
           dispatch(setSingleJob(res.data.job));
           setIsApplied(
-            res.data.job.applications.some(
-              (application) => application.applicant === user?._id
+            res?.data?.job?.applications?.some(
+              (application) => application.applicant == user?._id
             )
-          );
+          ); // Ensure the state is in sync with fetched data
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     };
     fetchSingleJob();
   }, [jobId, dispatch, user?._id]);
+
   return (
     <div className="max-w-7xl mx-auto my-10">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-bold text-xl">{singleJob?.title}</h1>
           <div className="flex items-center gap-2 mt-4">
-            <Badge className={"text-[blue] font-bold"} variant="ghost">
-              {singleJob?.postion}Position
+            <Badge className={"text-blue-700 font-bold"} variant="ghost">
+              {singleJob?.postion} Positions
             </Badge>
-            <Badge className={"text-[red] font-bold"} variant="ghost">
-              {singleJob?.jobType}Part Time
+            <Badge className={"text-[#F83002] font-bold"} variant="ghost">
+              {singleJob?.jobType}
             </Badge>
-            <Badge className={"text-[purple] font-bold"} variant="ghost">
+            <Badge className={"text-[#7209b7] font-bold"} variant="ghost">
               {singleJob?.salary}LPA
             </Badge>
           </div>
         </div>
         <Button
           onClick={isApplied ? null : applyJobHandler}
-          disable={isApplied}
+          disabled={isApplied}
           className={`rounded-lg ${
             isApplied
               ? "bg-gray-600 cursor-not-allowed"
@@ -129,11 +132,11 @@ const JobDescription = () => {
         <h1 className="font-bold my-1">
           Total Applicants:{" "}
           <span className="pl-4 font-normal text-gray-800">
-            {singleJob?.applications.length}
+            {singleJob?.applications?.length}
           </span>
         </h1>
         <h1 className="font-bold my-1">
-          Posted Date:
+          Posted Date:{" "}
           <span className="pl-4 font-normal text-gray-800">
             {singleJob?.createdAt.split("T")[0]}
           </span>

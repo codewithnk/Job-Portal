@@ -1,19 +1,19 @@
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Label } from "../ui/label";
-import { setSingleCompany } from "@/redux/companySlice";
-import { useSelector } from "react-redux";
-import { toast } from "sonner";
+import { Input } from "../ui/input";
 import axios from "axios";
 import { COMPANY_API_END_POINT } from "@/utils/constant";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import useGetCompanyById from "../hooks/useGetCompanyById";
 
 const CompanySetup = () => {
-  const [loading, setLoading] = useState(false);
   const params = useParams();
+  useGetCompanyById(params.id);
   const [input, setInput] = useState({
     name: "",
     description: "",
@@ -21,6 +21,8 @@ const CompanySetup = () => {
     location: "",
     file: null,
   });
+  const { singleCompany } = useSelector((store) => store.company);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const changeEventHandler = (e) => {
@@ -31,7 +33,6 @@ const CompanySetup = () => {
     const file = e.target.files?.[0];
     setInput({ ...input, file });
   };
-  const { singleCompany } = useSelector((store) => store.company);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -62,7 +63,6 @@ const CompanySetup = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
-      //   setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,7 @@ const CompanySetup = () => {
             <div>
               <Label>Company Name</Label>
               <Input
-                text="text"
+                type="text"
                 name="name"
                 value={input.name}
                 onChange={changeEventHandler}
@@ -107,27 +107,27 @@ const CompanySetup = () => {
             <div>
               <Label>Description</Label>
               <Input
-                text="text"
+                type="text"
                 name="description"
                 value={input.description}
                 onChange={changeEventHandler}
               />
             </div>
             <div>
-              <Label>Location</Label>
+              <Label>Website</Label>
               <Input
-                text="text"
-                name="location"
-                value={input.location}
+                type="text"
+                name="website"
+                value={input.website}
                 onChange={changeEventHandler}
               />
             </div>
             <div>
-              <Label>Website</Label>
+              <Label>Location</Label>
               <Input
-                text="text"
-                name="website"
-                value={input.website}
+                type="text"
+                name="location"
+                value={input.location}
                 onChange={changeEventHandler}
               />
             </div>
@@ -140,16 +140,16 @@ const CompanySetup = () => {
               />
             </div>
           </div>
-          <Button className="w-full my-4">
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                "Please wait"
-              </>
-            ) : (
-              "Update"
-            )}
-          </Button>
+          {loading ? (
+            <Button className="w-full my-4">
+              {" "}
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait{" "}
+            </Button>
+          ) : (
+            <Button type="submit" className="w-full my-4">
+              Update
+            </Button>
+          )}
         </form>
       </div>
     </div>

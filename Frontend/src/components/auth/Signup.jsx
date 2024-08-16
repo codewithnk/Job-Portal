@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -16,14 +16,14 @@ const Signup = () => {
   const [input, setInput] = useState({
     fullname: "",
     email: "",
-    password: "",
     phoneNumber: "",
+    password: "",
     role: "",
     file: "",
   });
-  const { loading } = useSelector((store) => store.auth);
-  const navigate = useNavigate();
+  const { loading, user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -31,10 +31,9 @@ const Signup = () => {
   const changeFileHandler = (e) => {
     setInput({ ...input, file: e.target.files?.[0] });
   };
-
   const submitHandler = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
+    const formData = new FormData(); //formdata object
     formData.append("fullname", input.fullname);
     formData.append("email", input.email);
     formData.append("phoneNumber", input.phoneNumber);
@@ -50,21 +49,23 @@ const Signup = () => {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-
       if (res.data.success) {
         navigate("/login");
         toast.success(res.data.message);
-      } else {
-        toast.error("An unexpected error occurred.");
       }
     } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data.message);
-      }
+      console.log(error);
+      toast.error(error.response.data.message);
     } finally {
       dispatch(setLoading(false));
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, []);
   return (
     <div>
       <Navbar />
@@ -81,7 +82,7 @@ const Signup = () => {
               value={input.fullname}
               name="fullname"
               onChange={changeEventHandler}
-              placeholder="Enter FullName"
+              placeholder="Enter Your Name"
             />
           </div>
           <div className="my-2">
@@ -91,7 +92,7 @@ const Signup = () => {
               value={input.email}
               name="email"
               onChange={changeEventHandler}
-              placeholder="Enter Your Email"
+              placeholder="Please Enter Your Email"
             />
           </div>
           <div className="my-2">
@@ -101,7 +102,7 @@ const Signup = () => {
               value={input.phoneNumber}
               name="phoneNumber"
               onChange={changeEventHandler}
-              placeholder="Enter Your Phone Number"
+              placeholder="Please Contact Number"
             />
           </div>
           <div className="my-2">
@@ -111,7 +112,7 @@ const Signup = () => {
               value={input.password}
               name="password"
               onChange={changeEventHandler}
-              placeholder="Enter Your Password"
+              placeholder="Please Enter Your Password"
             />
           </div>
           <div className="flex items-center justify-between">
@@ -151,6 +152,7 @@ const Signup = () => {
           </div>
           {loading ? (
             <Button className="w-full my-4">
+              {" "}
               <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait{" "}
             </Button>
           ) : (

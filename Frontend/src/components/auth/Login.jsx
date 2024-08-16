@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { RadioGroup } from "../ui/radio-group";
 import { Button } from "../ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
-import { setLoading, setUser } from "@/redux/authSlice";
+import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
+import { setLoading, setUser } from "@/redux/authSlice";
 import { Loader2 } from "lucide-react";
 
 const Login = () => {
@@ -18,8 +18,7 @@ const Login = () => {
     password: "",
     role: "",
   });
-
-  const { loading } = useSelector((store) => store.auth);
+  const { loading, user } = useSelector((store) => store.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -32,27 +31,28 @@ const Login = () => {
     try {
       dispatch(setLoading(true));
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         withCredentials: true,
       });
       if (res.data.success) {
         dispatch(setUser(res.data.user));
         navigate("/");
-        const token = res.data.message;
-        console.log(token);
         toast.success(res.data.message);
-      } else {
-        toast.error("An unexpected error occurred.");
       }
     } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data.message);
-      }
+      console.log(error);
+      toast.error(error.response.data.message);
     } finally {
       dispatch(setLoading(false));
     }
   };
-
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, []);
   return (
     <div>
       <Navbar />
@@ -69,9 +69,10 @@ const Login = () => {
               value={input.email}
               name="email"
               onChange={changeEventHandler}
-              placeholder="Enter Your Email"
+              placeholder="Please Enter Your Email"
             />
           </div>
+
           <div className="my-2">
             <Label>Password</Label>
             <Input
@@ -79,7 +80,7 @@ const Login = () => {
               value={input.password}
               name="password"
               onChange={changeEventHandler}
-              placeholder="Enter Your Password"
+              placeholder="Please Enter Your Password"
             />
           </div>
           <div className="flex items-center justify-between">
@@ -119,7 +120,7 @@ const Login = () => {
             </Button>
           )}
           <span className="text-sm">
-            Already have an account?{" "}
+            Don't have an account?{" "}
             <Link to="/signup" className="text-blue-600">
               Signup
             </Link>

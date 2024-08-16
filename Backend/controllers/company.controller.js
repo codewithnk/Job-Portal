@@ -69,7 +69,7 @@ export const getCompanyById = async (req, res) => {
         console.log(error);
     }
 }
-export const updatedCompany = async (req, res) => {
+export const updateCompany = async (req, res) => {
     try {
         const { name, description, website, location } = req.body;
  
